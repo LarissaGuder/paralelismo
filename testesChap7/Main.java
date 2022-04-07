@@ -7,9 +7,8 @@ import java.util.concurrent.locks.*;
 
 class Main {
     static Lock lock;
-    static double[] sharedData;
-    static int L = 1000000, N = 14, D = 0;
-    static long TASTime1, TASTime2, result;
+    static int L = 100000, N = 16, D = 0;
+    static long start, end;
 
     // N: 2, 4, 6, 8, 10, 12, 14, 16.  (depende de onde roda)
     // L: nro de iterações - 1000.000.  (chute)
@@ -19,6 +18,7 @@ class Main {
         Thread t = new Thread(() -> {
             for (int i = 0; i < L; i++) {
                 lock.lock();
+                /// Adicionar algum processamento  (cpu bound) >> NÃO SLEEP
                 lock.unlock();
             }
         });
@@ -40,29 +40,32 @@ class Main {
     public static void main(String[] args) {
         try {
             PrintWriter writer = new PrintWriter("testesChap7\\graphs\\results.csv", "UTF-8");
+            /// Repetir o exp e fazer média
+            /// Repetir exp por n vezes, remover maior e menor resultado, e usar média
             for (int i = 2; i < N; i = i + 2) {
-                TASTime1 = System.nanoTime();
+                writer.print(i + ",");
+                start = System.nanoTime();
                 lock = new TASLock();
                 testThreads(i);
-                TASTime2 = System.nanoTime();
-                result = TASTime2 - TASTime1;
-
-                TASTime1 = System.nanoTime();
+                end = System.nanoTime();
+                writer.print(end - start + ",");
+                start = System.nanoTime();
                 lock = new TTASLock();
                 testThreads(i);
-                TASTime2 = System.nanoTime();
-                long resultTTAS = TASTime2 - TASTime1;
-
-                TASTime1 = System.nanoTime();
+                end = System.nanoTime();
+                writer.print(end - start + ",");
+                start = System.nanoTime();
                 lock = new BackoffLock();
                 testThreads(i);
-                TASTime2 = System.nanoTime();
-                long resultBackOff = TASTime2 - TASTime1;
-
-                writer.println(i + "," + result + "," + resultTTAS + "," + resultBackOff);
+                end = System.nanoTime();
+                writer.print(end - start + ",");
+                start = System.nanoTime();
+                lock = new SemLock();
+                testThreads(i);
+                end = System.nanoTime();
+                writer.println(end - start);
             }
             writer.close();
-
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
