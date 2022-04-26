@@ -1,6 +1,9 @@
 package testesChap7;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 public class MCSLock implements Lock {
     AtomicReference<QNode> queue;
@@ -10,11 +13,6 @@ public class MCSLock implements Lock {
         queue = new AtomicReference<>(null);
         // initialize thread-local variable
         myNode = ThreadLocal.withInitial(() -> new QNode());
-    }
-
-    @Override
-    public boolean trylock() {
-        return false;
     }
 
     @Override
@@ -45,5 +43,29 @@ public class MCSLock implements Lock {
     static class QNode { // Queue node inner class
         volatile boolean locked = false;
         volatile QNode next = null;
+    }
+
+    @Override
+    public void lockInterruptibly() throws InterruptedException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public boolean tryLock() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Condition newCondition() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

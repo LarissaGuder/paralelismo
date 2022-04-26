@@ -1,6 +1,9 @@
 package testesChap7;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 public class CLHLock implements Lock {
     AtomicReference<QNode> tail;
@@ -19,11 +22,6 @@ public class CLHLock implements Lock {
                 return null;
             }
         };
-    }
-
-    @Override
-    public boolean trylock() {
-        return false;
     }
 
     @Override
@@ -49,5 +47,29 @@ public class CLHLock implements Lock {
 
     static class QNode { // Queue node inner class
         public volatile boolean locked = false;
+    }
+
+    @Override
+    public void lockInterruptibly() throws InterruptedException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public boolean tryLock() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public Condition newCondition() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

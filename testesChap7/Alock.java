@@ -1,19 +1,21 @@
 package testesChap7;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 public class ALock implements Lock {
-    private ThreadLocal<Integer> mySlotIndex = ThreadLocal.withInitial(() -> 0);
+    ThreadLocal<Integer> mySlotIndex = new ThreadLocal<Integer>() {
+        protected Integer initialValue() {
+            return 0;
+        }
+    };
 
-    private AtomicInteger tail;
-    private boolean[] flag;
-    private int size;
+    AtomicInteger tail;
+    boolean[] flag;
+    int size;
 
-    /**
-     * Constructor
-     * 
-     * @param capacity max number of array slots
-     */
     public ALock(int capacity) {
         size = capacity;
         tail = new AtomicInteger(0);
@@ -21,23 +23,37 @@ public class ALock implements Lock {
         flag[0] = true;
     }
 
-    @Override
-    public boolean trylock() {
-        return false;
-    }
-
-    @Override
     public void lock() {
         int slot = tail.getAndIncrement() % size;
         mySlotIndex.set(slot);
-        while (!flag[mySlotIndex.get()]) {
+        while (!flag[slot]) {
         }
         ;
     }
 
-    @Override
     public void unlock() {
-        flag[mySlotIndex.get()] = false;
-        flag[(mySlotIndex.get() + 1) % size] = true;
+        int slot = mySlotIndex.get();
+        flag[slot] = false;
+        flag[(slot + 1) % size] = true;
+    }
+
+    @Override
+    public void lockInterruptibly() throws InterruptedException {
+
+    }
+
+    @Override
+    public boolean tryLock() {
+        return false;
+    }
+
+    @Override
+    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+        return false;
+    }
+
+    @Override
+    public Condition newCondition() {
+        return null;
     }
 }
