@@ -13,7 +13,7 @@ public class ALock implements Lock {
     };
 
     AtomicInteger tail;
-    boolean[] flag;
+    volatile boolean[] flag;
     int size;
 
     public ALock(int capacity) {
@@ -39,21 +39,26 @@ public class ALock implements Lock {
 
     @Override
     public void lockInterruptibly() throws InterruptedException {
+        // TODO Auto-generated method stub
 
     }
 
     @Override
     public boolean tryLock() {
+        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public Condition newCondition() {
+        // TODO Auto-generated method stub
         return null;
     }
+
 }
