@@ -9,14 +9,19 @@ import java.util.concurrent.locks.*;
 
 class Main {
     static Lock lock;
-    static int L = 1000, N = 16, D = 0, METHODS = 1, REPEAT = 10;
+    static int L = 100000, N = 12, REPEAT = 100, D = 10;
     static long start, end;
 
     // N: 2, 4, 6, 8, 10, 12, 14, 16. (depende de onde roda)
     // L: nro de iterações - 1000.000. (chute)
     // D: por enquanto 0. ( nao ha tempo associado ao uso do recurso - unlock é
     // imediato)
-    // TODO: Implementar algoritmos do cap 7.5
+    // TODO: Procurar por fontes na literatura onde há avaliação de desempenho dos
+    // métodos
+    // TODO: Testar em máquina com no mínimo 16 núcleos físicos
+    // TODO: Testar com 3 grãos de trabalho: vazio, leve, pesado
+    // TODO: Verificar se dá para comparar com try lock o 7.6
+    // TODO: Testar entre o compositeLock.
     static Thread thread(int n) {
         Thread t = new Thread(() -> {
             for (int i = 0; i < L; i++) {
@@ -50,7 +55,7 @@ class Main {
 
     // Consolidado (CPU BOUND)
     static void bubbleSort() {
-        int temp, arraysize = 10;
+        int temp, arraysize = D;
         int[] array = new int[arraysize];
 
         for (int i = 0; i < arraysize; i++) {
@@ -69,6 +74,13 @@ class Main {
     }
 
     static long returnMedia(int thread) {
+        if (REPEAT == 1) {
+            return TimeUnit.MILLISECONDS.convert(testThreads(thread), TimeUnit.NANOSECONDS) ;
+        } else if (REPEAT == 2) {
+            long a = testThreads(thread);
+            long b = testThreads(thread);
+            return TimeUnit.MILLISECONDS.convert((a + b) / 2, TimeUnit.NANOSECONDS) ;
+        }
         long[] result = new long[REPEAT];
         long media = 0;
         for (int i = 0; i < REPEAT; i++) {
@@ -79,8 +91,8 @@ class Main {
             media += result[i];
         }
         media = media / (REPEAT - 2);
-        // media = TimeUnit.SECONDS.convert(media, TimeUnit.NANOSECONDS);
-
+        media = TimeUnit.MILLISECONDS.convert(media, TimeUnit.NANOSECONDS);
+        System.out.println(" time >> " + media + " >> n threads  " + thread);
         return media;
     }
 
@@ -90,23 +102,31 @@ class Main {
         PrintWriter writer;
         try {
             writer = new PrintWriter("testesChap7\\graphs\\results.csv", "UTF-8");
-            for (int i = 2; i < N; i = i + 2) {
+            for (int i = 2; i <= N; i = i + 2) {
                 writer.print(i + ",");
+                System.out.print(">> TASLock     >>");
                 lock = new TASLock();
                 writer.print(returnMedia(i) + ",");
+                System.out.print(">> TTASLock    >>");
                 lock = new TTASLock();
                 writer.print(returnMedia(i) + ",");
+                System.out.print(">> BackoffLock >>");
                 lock = new BackoffLock();
                 writer.print(returnMedia(i) + ",");
+                System.out.print(">> SemLock     >>");
                 lock = new SemLock();
                 writer.print(returnMedia(i) + ",");
-                // Saporra não está funcionando
-                // lock = new ALock(120);
-                // writer.print(testTASLock(i) + ",");
+                System.out.print(">> ALock       >>");
+                // Verificar motivo de travar ao executar com maior número de threads
+                lock = new ALock(i);
+                writer.print(returnMedia(i) + ",");
+                System.out.print(">> MCSLock     >>");
                 lock = new MCSLock();
                 writer.print(returnMedia(i) + ",");
+                System.out.print(">> CLHLock     >>");
                 lock = new CLHLock();
                 writer.println(returnMedia(i));
+
             }
 
             writer.close();
