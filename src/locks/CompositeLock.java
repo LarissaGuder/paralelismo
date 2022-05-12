@@ -136,7 +136,7 @@ public class CompositeLock implements Lock {
     private void waitForPredecessor(QNode pred, QNode node, long startTime, long patience)
             throws TimeoutException {
         // wait for predecessor to release lock
-        int[] stamp = { 0 };
+        // int[] stamp = { 0 };
         if (pred == null) {
             myNode.set(node);
             return;
