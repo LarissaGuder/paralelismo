@@ -1,58 +1,54 @@
-package testesChap7;
+package locks;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
-public class CLHLock implements Lock {
-    AtomicReference<QNode> tail;
-    ThreadLocal<QNode> myPred;
+public class MCSLock implements Lock {
+    AtomicReference<QNode> queue;
     ThreadLocal<QNode> myNode;
 
-    public CLHLock() {
-        tail = new AtomicReference<QNode>(new QNode());
-        myNode = new ThreadLocal<QNode>() {
-            protected QNode initialValue() {
-                return new QNode();
-            }
-        };
-        myPred = new ThreadLocal<QNode>() {
-            protected QNode initialValue() {
-                return null;
-            }
-        };
+    public MCSLock() {
+        queue = new AtomicReference<>(null);
+        // initialize thread-local variable
+        myNode = ThreadLocal.withInitial(() -> new QNode());
     }
 
     @Override
     public void lock() {
-
         QNode qnode = myNode.get();
-        qnode.locked = true;
-        QNode pred = tail.getAndSet(qnode);
-        myPred.set(pred);
-        while (pred.locked) {
+        QNode pred = queue.getAndSet(qnode);
+        if (pred != null) {
+            qnode.locked = true;
+            pred.next = qnode;
+            while (qnode.locked) {
+            } // spin
         }
-
     }
 
     @Override
     public void unlock() {
-
         QNode qnode = myNode.get();
-        qnode.locked = false;
-        myNode.set(myPred.get());
-
+        if (qnode.next == null) {
+            if (queue.compareAndSet(qnode, null))
+                return;
+            while (qnode.next == null) {
+            } // spin
+        }
+        qnode.next.locked = false;
+        qnode.next = null;
     }
 
     static class QNode { // Queue node inner class
-        public volatile boolean locked = false;
+        volatile boolean locked = false;
+        volatile QNode next = null;
     }
 
     @Override
     public void lockInterruptibly() throws InterruptedException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override

@@ -1,4 +1,4 @@
-package testesChap7;
+package locks;
 import java.util.Random;
 
 public class Backoff {

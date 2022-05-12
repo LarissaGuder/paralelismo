@@ -1,4 +1,4 @@
-package testesChap7;
+package locks;
 
 /**
  * Illustrates use of thread-local storage. Test by running main().

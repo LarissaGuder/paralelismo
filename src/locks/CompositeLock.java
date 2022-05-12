@@ -1,4 +1,4 @@
-package testesChap7;
+package locks;
 
 import java.lang.UnsupportedOperationException;
 import java.util.Random;

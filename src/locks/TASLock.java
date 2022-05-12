@@ -1,46 +1,25 @@
-package testesChap7;
+package locks;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
-public class ALock implements Lock {
-    ThreadLocal<Integer> mySlotIndex = new ThreadLocal<Integer>() {
-        protected Integer initialValue() {
-            return 0;
-        }
-    };
-
-    AtomicInteger tail;
-    volatile boolean[] flag;
-    int size;
-
-    public ALock(int capacity) {
-        size = capacity;
-        tail = new AtomicInteger(0);
-        flag = new boolean[capacity];
-        flag[0] = true;
-    }
-
+public class TASLock implements Lock {
+    AtomicBoolean state = new AtomicBoolean(false);
     public void lock() {
-        int slot = tail.getAndIncrement() % size;
-        mySlotIndex.set(slot);
-        while (!flag[slot]) {
+        while (state.getAndSet(true)) {
         }
-        ;
     }
 
     public void unlock() {
-        int slot = mySlotIndex.get();
-        flag[slot] = false;
-        flag[(slot + 1) % size] = true;
+        state.set(false);
     }
 
     @Override
     public void lockInterruptibly() throws InterruptedException {
         // TODO Auto-generated method stub
-
+        
     }
 
     @Override
@@ -60,5 +39,4 @@ public class ALock implements Lock {
         // TODO Auto-generated method stub
         return null;
     }
-
 }

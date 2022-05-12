@@ -1,4 +1,4 @@
-package testesChap7;
+package locks;
 
 import java.util.ArrayList;
 import java.util.List;

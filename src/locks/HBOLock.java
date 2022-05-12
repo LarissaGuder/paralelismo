@@ -1,4 +1,4 @@
-package testesChap7;
+package locks;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.Condition;

@@ -1,39 +1,40 @@
-package testesChap7;
+package locks;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
-public class BackoffLock implements Lock {
-    private AtomicBoolean state = new AtomicBoolean(false);
-    private static final int MIN_DELAY = 2;
-    private static final int MAX_DELAY = 6;
+public class ALock implements Lock {
+    ThreadLocal<Integer> mySlotIndex = new ThreadLocal<Integer>() {
+        protected Integer initialValue() {
+            return 0;
+        }
+    };
+
+    AtomicInteger tail;
+    volatile boolean[] flag;
+    int size;
+
+    public ALock(int capacity) {
+        size = capacity;
+        tail = new AtomicInteger(0);
+        flag = new boolean[capacity];
+        flag[0] = true;
+    }
 
     public void lock() {
-        Backoff backoff = new Backoff(MIN_DELAY, MAX_DELAY);
-        while (true) {
-            while (state.get()) {
-            }
-            ;
-            if (!state.getAndSet(true)) {
-
-                return;
-
-            } else {
-                try {
-                    backoff.backoff();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
+        int slot = tail.getAndIncrement() % size;
+        mySlotIndex.set(slot);
+        while (!flag[slot]) {
         }
-
+        ;
     }
 
     public void unlock() {
-        state.set(false);
+        int slot = mySlotIndex.get();
+        flag[slot] = false;
+        flag[(slot + 1) % size] = true;
     }
 
     @Override
@@ -59,4 +60,5 @@ public class BackoffLock implements Lock {
         // TODO Auto-generated method stub
         return null;
     }
+
 }

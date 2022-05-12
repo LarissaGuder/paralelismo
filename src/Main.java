@@ -1,4 +1,3 @@
-package testesChap7;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -7,9 +6,19 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.*;
 
+import locks.ALock;
+import locks.BackoffLock;
+import locks.CLHLock;
+import locks.CompositeFastPathLock;
+import locks.CompositeLock;
+import locks.MCSLock;
+import locks.SemLock;
+import locks.TASLock;
+import locks.TTASLock;
+
 class Main {
     static Lock lock;
-    static int L = 100000, N = 12, REPEAT = 100, D = 10;
+    static int L = 100000, N = 22, REPEAT = 10, D = 1;
     static long start, end;
 
     // N: 2, 4, 6, 8, 10, 12, 14, 16. (depende de onde roda)
@@ -75,11 +84,11 @@ class Main {
 
     static long returnMedia(int thread) {
         if (REPEAT == 1) {
-            return TimeUnit.MILLISECONDS.convert(testThreads(thread), TimeUnit.NANOSECONDS) ;
+            return TimeUnit.MILLISECONDS.convert(testThreads(thread), TimeUnit.NANOSECONDS);
         } else if (REPEAT == 2) {
             long a = testThreads(thread);
             long b = testThreads(thread);
-            return TimeUnit.MILLISECONDS.convert((a + b) / 2, TimeUnit.NANOSECONDS) ;
+            return TimeUnit.MILLISECONDS.convert((a + b) / 2, TimeUnit.NANOSECONDS);
         }
         long[] result = new long[REPEAT];
         long media = 0;
@@ -101,30 +110,34 @@ class Main {
         /// Repetir exp por n vezes, remover maior e menor resultado, e usar média
         PrintWriter writer;
         try {
-            writer = new PrintWriter("testesChap7\\graphs\\results.csv", "UTF-8");
+            writer = new PrintWriter("src\\graphs\\results.csv", "UTF-8");
             for (int i = 2; i <= N; i = i + 2) {
                 writer.print(i + ",");
-                System.out.print(">> TASLock     >>");
+                // System.out.print(">> TASLock >>");
                 lock = new TASLock();
                 writer.print(returnMedia(i) + ",");
-                System.out.print(">> TTASLock    >>");
+                // System.out.print(">> TTASLock >>");
                 lock = new TTASLock();
                 writer.print(returnMedia(i) + ",");
-                System.out.print(">> BackoffLock >>");
+                // System.out.print(">> BackoffLock >>");
                 lock = new BackoffLock();
                 writer.print(returnMedia(i) + ",");
-                System.out.print(">> SemLock     >>");
+                // System.out.print(">> SemLock >>");
                 lock = new SemLock();
                 writer.print(returnMedia(i) + ",");
-                System.out.print(">> ALock       >>");
+                // System.out.print(">> ALock >>");
                 // Verificar motivo de travar ao executar com maior número de threads
                 lock = new ALock(i);
                 writer.print(returnMedia(i) + ",");
-                System.out.print(">> MCSLock     >>");
+                // System.out.print(">> MCSLock >>");
                 lock = new MCSLock();
                 writer.print(returnMedia(i) + ",");
-                System.out.print(">> CLHLock     >>");
+                // System.out.print(">> CLHLock >>");
                 lock = new CLHLock();
+                writer.print(returnMedia(i) + ",");
+                lock = new CompositeFastPathLock();
+                writer.print(returnMedia(i) + ",");
+                lock = new CompositeLock();
                 writer.println(returnMedia(i));
 
             }

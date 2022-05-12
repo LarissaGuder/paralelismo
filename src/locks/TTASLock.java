@@ -1,14 +1,20 @@
-package testesChap7;
+package locks;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
-public class TASLock implements Lock {
+public class TTASLock implements Lock {
     AtomicBoolean state = new AtomicBoolean(false);
+
     public void lock() {
-        while (state.getAndSet(true)) {
+        while (true) {
+            while (state.get()) {
+            }
+            ;
+            if (!state.getAndSet(true))
+                return;
         }
     }
 
@@ -19,7 +25,6 @@ public class TASLock implements Lock {
     @Override
     public void lockInterruptibly() throws InterruptedException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
