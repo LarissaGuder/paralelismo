@@ -79,7 +79,7 @@ public class calcMedia {
         }
         media = media / (numRepetitions - 2);
         System.out.println(" time >> " + media + " >> n threads  " + numThreadsExec);
-        media = TimeUnit.MILLISECONDS.convert(media, TimeUnit.NANOSECONDS);
+        // media = TimeUnit.MILLISECONDS.convert(media, TimeUnit.NANOSECONDS);
         return media;
     }
 }

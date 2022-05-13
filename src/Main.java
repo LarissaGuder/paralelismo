@@ -19,21 +19,22 @@ class Main {
 
     public static void main(String[] args) {
 
-        if (args.length != 4) {
-            System.out.println("Usage: java numThreads numIterations numRepetitions sizeBubbleSort");
+        if (args.length != 5) {
+            System.out.println("Usage: java numThreads numIterations numRepetitions sizeBubbleSort fileName");
         } else {
             System.out.println("Executando experimentos");
             runExperiment(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]),
-                    Integer.parseInt(args[3]));
+                    Integer.parseInt(args[3]), args[4]);
         }
     }
 
-    static void runExperiment(int numThreads, int numIterations, int numRepetitions, int sizeBubbleSort) {
+    static void runExperiment(int numThreads, int numIterations, int numRepetitions, int sizeBubbleSort,
+            String fileName) {
         Lock lock;
 
         PrintWriter writer;
         try {
-            writer = new PrintWriter("src\\graphs\\results.csv", "UTF-8");
+            writer = new PrintWriter("src\\graphs\\" + fileName + ".csv", "UTF-8");
             for (int numThreadsExec = 2; numThreadsExec <= numThreads; numThreadsExec = numThreadsExec + 2) {
                 writer.print(numThreadsExec + ",");
                 // System.out.print(">> TASLock >>");
