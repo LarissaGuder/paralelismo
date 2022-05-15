@@ -21,16 +21,6 @@ class Main {
         static int L , N, REPEAT, D;
         static long start, end;
 
-        // N: 2, 4, 6, 8, 10, 12, 14, 16. (depende de onde roda)
-        // L: nro de iterações - 1000.000. (chute)
-        // D: por enquanto 0. ( nao ha tempo associado ao uso do recurso - unlock é
-        // imediato)
-        // TODO: Procurar por fontes na literatura onde há avaliação de desempenho dos
-        // métodos
-        // TODO: Testar em máquina com no mínimo 16 núcleos físicos
-        // TODO: Testar com 3 grãos de trabalho: vazio, leve, pesado
-        // TODO: Verificar se dá para comparar com try lock o 7.6
-        // TODO: Testar entre o compositeLock.
         static Thread thread(int n) {
                 Thread t = new Thread(() -> {
                         for (int i = 0; i < L; i++) {
@@ -127,45 +117,36 @@ class Main {
                                         // System.out.print(">> TASLock >>");
                                         lock = new TASLock();
                                         writer.print(returnMedia(i) + ",");
-                                        Thread.sleep(1000);  
                                         // System.out.print(">> TTASLock >>");
                                         lock = new TTASLock();
                                         writer.print(returnMedia(i) + ",");
-                                        Thread.sleep(1000);  
 
                                         // System.out.print(">> BackoffLock >>");
                                         lock = new BackoffLock();
                                         writer.print(returnMedia(i) + ",");
-                                        Thread.sleep(1000);  
 
                                         // System.out.print(">> SemLock >>");
                                         lock = new SemLock();
                                         writer.print(returnMedia(i) + ",");
-                                        Thread.sleep(1000);  
 
                                         // System.out.print(">> ALock >>");
                                         // Verificar motivo de travar ao executar com maior número de threads
                                         lock = new ALock(i);
                                         writer.print(returnMedia(i) + ",");
-                                        Thread.sleep(1000);  
 
                                         // System.out.print(">> MCSLock >>");
                                         lock = new MCSLock();
                                         writer.print(returnMedia(i) + ",");
-                                        Thread.sleep(1000);  
 
                                         // System.out.print(">> CLHLock >>");
                                         lock = new CLHLock();
                                         writer.print(returnMedia(i) + ",");
-                                        Thread.sleep(1000);  
 
                                         lock = new CompositeFastPathLock();
                                         writer.print(returnMedia(i) + ",");
-                                        Thread.sleep(1000);  
 
                                         lock = new CompositeLock();
                                         writer.println(returnMedia(i));
-                                        Thread.sleep(1000);  
 
                                 }
 
